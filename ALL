@@ -1,0 +1,1211 @@
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 1: A. Study of Basic Linux Commands: echo, ls, read, cat, touch, test, loops, 
+arithmetic comparison, conditional loops, grep, sed etc. B. Write a program to implement an 
+address book with options given below: a) Create address book. b) View address book. c) 
+Insert a record. d) Delete a record. e) Modify a record. f) Exit 
+Code: 
+#!/bin/bash 
+opt=1 
+fileName="addressbook.txt" # Default file name (can be changed later) 
+while [ "$opt" -lt 6 ] 
+do 
+echo -e "\nChoose one of the Following:" 
+echo "1. Create a New Address Book" 
+echo "2. View Records" 
+echo "3. Insert New Record" 
+echo "4. Delete a Record" 
+echo "5. Modify a Record" 
+echo "6. Exit" 
+echo -n "Enter your choice: " 
+read opt 
+case $opt in 
+1) 
+echo -n "Enter filename: " 
+read fileName 
+if [ -e "$fileName" ]; then 
+rm "$fileName" 
+fi 
+echo -e "NAME\tNUMBER\t\tADDRESS\n===============================\n" 
+>> "$fileName" 
+cont=1 
+while [ "$cont" -gt 0 ] 
+do 
+echo -n "Enter Name: " 
+read name 
+echo -n "Enter Phone Number of $name: " 
+read number 
+echo -n "Enter Address of $name: " 
+read address 
+echo -e "$name\t$number\t\t$address" >> "$fileName" 
+echo -n "Enter 0 to Stop, 1 to Enter next: " 
+read cont 
+done 
+;; 
+2) 
+3) 
+if [ -e "$fileName" ]; then 
+echo -e "\n===== Address Book: $fileName =====" 
+cat "$fileName" 
+else 
+echo "File not found! Please create an address book first." 
+fi 
+;; 
+if [ ! -e "$fileName" ]; then 
+echo "File not found! Please create an address book first." 
+else 
+echo -n "Enter Name: " 
+read name 
+echo -n "Enter Phone Number of $name: " 
+read number 
+echo -n "Enter Address of $name: " 
+read address 
+echo -e "$name\t$number\t\t$address" >> "$fileName" 
+echo "Record inserted successfully!" 
+fi 
+;; 
+4) 
+5) 
+if [ ! -e "$fileName" ]; then 
+echo "File not found! Please create an address book first." 
+else 
+echo -n "Delete record — Enter Name/Phone Number: " 
+read pattern 
+grep -v "$pattern" "$fileName" > temp 
+mv temp "$fileName" 
+echo "Record deleted (if found)." 
+fi 
+;; 
+if [ ! -e "$fileName" ]; then 
+echo "File not found! Please create an address book first." 
+else 
+echo -n "Modify record — Enter Name/Phone Number: " 
+read pattern 
+grep -v "$pattern" "$fileName" > temp 
+mv temp "$fileName" 
+echo -n "Enter New Name: " 
+read name 
+echo -n "Enter Phone Number of $name: " 
+read number 
+echo -n "Enter Address of $name: " 
+read address 
+echo -e "$name\t$number\t\t$address" >> "$fileName" 
+echo "Record modified successfully!" 
+fi 
+;; 
+6) 
+*) 
+esac 
+done 
+echo "Exiting program..." 
+exit 0 
+;; 
+echo "Invalid option! Please try again." 
+;; 
+Output of Assignment 1: 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 2: Process control system calls: The demonstration of FORK, EXECVE and 
+WAIT system calls along with zombie and orphan states. 
+A.
+ Implement the C program in which main program accepts the integers to be sorted. Main 
+program uses the FORK system call to create a new process called a child process. Parent 
+process sorts the integers using sorting algorithm and waits for child process using WAIT 
+system call to sort the integers using any sorting algorithm. Also demonstrate zombie and 
+orphan states. 
+B.
+ Implement the C program in which main program accepts an array. Main program uses the 
+FORK system call to create a new process called a child process. Parent process sorts an 
+array and passes the sorted array to child process through the command line arguments of 
+EXECVE system call. The child process uses EXECVE system call to load new program 
+which display array in reverse order. 
+Code (A): 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <sys/wait.h> 
+void bubbleSort(int arr[], int n) { 
+int i, j, temp; 
+for (i = 0; i < n-1; i++) { 
+for (j = 0; j < n-i-1; j++) { 
+if (arr[j] > arr[j+1]) { 
+temp = arr[j]; 
+arr[j] = arr[j+1]; 
+arr[j+1] = temp; 
+} 
+} 
+} 
+} 
+int main() { 
+int n, i; 
+printf("Enter the number of integers to be sorted: "); 
+scanf("%d", &n); 
+int arr[n]; 
+printf("Enter the integers to be sorted: "); 
+for (i = 0; i < n; i++) { 
+scanf("%d", &arr[i]); 
+} 
+pid_t pid = fork(); 
+if (pid == 0) { 
+// Child process 
+printf("Child process sorting the integers using bubble sort algorithm...\n"); 
+bubbleSort(arr, n); 
+printf("Sorted integers by child process: "); 
+for (i = 0; i < n; i++) { 
+printf("%d ", arr[i]); 
+} 
+system("ps -x"); 
+printf("\n"); 
+} else if (pid > 0) { 
+// Parent process 
+printf("Parent process waiting for child process to complete...\n"); 
+wait(NULL); // Wait for the child process to complete 
+printf("Sorted integers by parent process: "); 
+for (i = 0; i < n; i++) { 
+printf("%d ", arr[i]); 
+} 
+printf("\n"); 
+} else { 
+} 
+// fork failed 
+printf("Fork failed!\n"); 
+return 1; 
+return 0; 
+} 
+Code (B): 
+Parent - 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <sys/wait.h> 
+void bubbleSort(int arr[], int n) { 
+int i, j, temp; 
+for (i = 0; i < n-1; i++) { 
+for (j = 0; j < n-i-1; j++) { 
+if (arr[j] > arr[j+1]) { 
+temp = arr[j]; 
+arr[j] = arr[j+1]; 
+arr[j+1] = temp; 
+} 
+} 
+} 
+} 
+int main() { 
+int n, i; 
+printf("Enter the number of integers to be sorted: "); 
+scanf("%d", &n); 
+int arr[n]; 
+printf("Enter the integers to be sorted: "); 
+for (i = 0; i < n; i++) { 
+scanf("%d", &arr[i]); 
+} 
+pid_t pid = fork(); 
+if (pid < 0) { 
+printf("Fork failed!\n"); 
+return 1; 
+} else if (pid == 0) { 
+char *args[n+2]; 
+args[0] = "./child"; 
+for (i = 0; i < n; i++) { 
+char *arg = (char *)malloc(20); 
+sprintf(arg, "%d", arr[i]); 
+args[i+1] = arg; 
+} 
+args[n+1] = NULL; 
+execve(args[0], args, NULL); 
+perror("execve failed"); 
+return 1; 
+} else { 
+printf("Parent process (PID: %d) sorting the integers...\n", getpid()); 
+bubbleSort(arr, n); 
+printf("Parent process (PID: %d) sorted integers: ", getpid()); 
+for (i = 0; i < n; i++) { 
+printf("%d ", arr[i]); 
+} 
+printf("\n"); 
+wait(NULL); 
+} 
+return 0; 
+} 
+Child - 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <sys/wait.h> 
+int main(int argc, char *argv[]) { 
+int n = argc - 1; 
+int arr[n]; 
+for (int i = 0; i < n; i++) { 
+arr[i] = atoi(argv[i+1]); 
+} 
+printf("Child process (PID: %d) displaying integers in reverse order: ", getpid()); 
+for (int i = n-1; i >= 0; i--) { 
+printf("%d ", arr[i]); 
+} 
+printf("\n"); 
+return 0; 
+} 
+Output of Assignment 3 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 3: Implement the C program for CPU Scheduling Algorithms: Shortest Job First 
+(Preemptive) and Round Robin with different arrival time. 
+Code: 
+#include<stdio.h> 
+int main() 
+{ 
+int i, NOP, sum=0, count=0, y, quant, wt=0, tat=0, at[10], bt[10], temp[10]; 
+float avg_wt, avg_tat; 
+printf(" Total number of process in the system: "); 
+scanf("%d", &NOP); 
+y = NOP; 
+for(i=0; i<NOP; i++) 
+{ 
+} 
+printf("\n Enter the Arrival and Burst time of the Process[%d]\n", i+1); 
+printf(" Arrival time is: \t"); 
+scanf("%d", &at[i]); 
+printf(" \nBurst time is: \t"); 
+scanf("%d", &bt[i]); 
+temp[i] = bt[i]; 
+printf("Enter the Time Quantum for the process: \t"); 
+scanf("%d", &quant); 
+printf("\n Process No \t\t Burst Time \t\t TAT \t\t Waiting Time "); 
+for(sum=0, i = 0; y!=0; ) 
+{ 
+if(temp[i] <= quant && temp[i] > 0) 
+{ 
+sum = sum + temp[i]; 
+temp[i] = 0; 
+count=1; 
+} 
+else if(temp[i] > 0) 
+{ 
+temp[i] = temp[i] - quant; 
+sum = sum + quant; 
+} 
+if(temp[i]==0 && count==1) 
+{ 
+y--; 
+printf("\nProcess No[%d] \t\t %d\t\t\t\t %d\t\t\t %d", i+1, bt[i], sum-at[i], sum- 
+at[i]-bt[i]); 
+wt = wt+sum-at[i]-bt[i]; 
+tat = tat+sum-at[i]; 
+count =0; 
+} 
+if(i==NOP-1) 
+{ 
+i=0; 
+} 
+else if(at[i+1]<=sum) 
+{ 
+i++; 
+} 
+else 
+{ 
+i=0; 
+} 
+} 
+avg_wt = wt * 1.0/NOP; 
+avg_tat = tat * 1.0/NOP; 
+printf("\n Average Turn Around Time: \t%f", avg_wt); 
+printf("\n Average Waiting Time: \t%f", avg_tat); 
+} 
+Output of Assignment 3 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 4: 
+A.
+ Thread synchronization using counting semaphores. Application to demonstrate: producer- 
+consumer problem with counting semaphores and mutex. 
+B.
+ Thread synchronization and mutual exclusion using mutex. Application to demonstrate: 
+Reader- Writer problem with reader priority. 
+Code (A): 
+#include<stdio.h> 
+#include<sys/types.h> 
+#include<semaphore.h> 
+#include<pthread.h> 
+#include<unistd.h> 
+char avbuff[10]; 
+sem_t mutex,empty,full; 
+void *produce(void *arg) 
+{ 
+int i; 
+printf("\n Inside Producer"); 
+for(i=0;i<10;i++) 
+{ 
+sem_wait(&empty); 
+sem_wait(&mutex); 
+avbuff[i]=i; 
+printf("\nItem produced is %d",avbuff[i]); 
+sem_post(&mutex); 
+sem_post(&full); 
+sleep(1); 
+} 
+pthread_exit(nullptr); 
+} 
+void *consumer(void *arg) 
+{ 
+} 
+int j; 
+printf("\nInside consumer"); 
+for(j=0;j<10;j++) 
+{ 
+sem_wait(&full); 
+sem_wait(&mutex); 
+j=avbuff[j]; 
+printf("\n Item consumed is %d",j); 
+sem_post(&mutex); 
+sem_post(&empty); 
+sleep(5); 
+} 
+pthread_exit(nullptr); 
+int main() 
+{ 
+pthread_t tid1,tid2; 
+sem_init(&empty,0,10); 
+sem_init(&full,0,0); 
+sem_init(&mutex,1,1); 
+void *status; 
+pthread_create(&tid1,NULL,produce,NULL); 
+pthread_create(&tid2,NULL,consumer,NULL); 
+pthread_join(tid1,&status); 
+printf("\nThe exited status %s \n",(char *)status); 
+pthread_join(tid2,&status); 
+printf("\nThe exited status %s \n",(char *)status); 
+return 1; 
+} 
+Code(B): 
+#include <stdio.h> 
+#include <pthread.h> 
+#include <semaphore.h> 
+#include <unistd.h> 
+#include<stdlib.h> 
+#define READERS 3 
+#define WRITERS 2 
+pthread_mutex_t mutex; 
+sem_t rw_mutex; 
+int readers_count = 0; 
+int shared_resource = 0; 
+void *reader(void *arg) { 
+int id = *((int *) arg); 
+while (1) { 
+sleep(rand() % 3); 
+pthread_mutex_lock(&mutex); 
+readers_count++; 
+if (readers_count == 1) { 
+sem_wait(&rw_mutex); 
+} 
+pthread_mutex_unlock(&mutex); 
+printf("Reader %d is reading: %d\n", id, shared_resource); 
+pthread_mutex_lock(&mutex); 
+readers_count--; 
+if (readers_count == 0) { 
+sem_post(&rw_mutex); 
+} 
+pthread_mutex_unlock(&mutex); 
+} 
+pthread_exit(NULL); 
+} 
+void *writer(void *arg) { 
+int id = *((int *) arg); 
+while (1) { 
+sleep(rand() % 3); 
+sem_wait(&rw_mutex); 
+shared_resource++; 
+printf("Writer %d is writing: %d\n", id, shared_resource); 
+sem_post(&rw_mutex); 
+} 
+pthread_exit(NULL); 
+} 
+int main() { 
+ 
+ 
+pthread_t reader_threads[READERS], writer_threads[WRITERS]; 
+int reader_ids[READERS], writer_ids[WRITERS]; 
+pthread_mutex_init(&mutex, NULL); 
+sem_init(&rw_mutex, 0, 1); 
+for (int i = 0; i < READERS; i++) { 
+reader_ids[i] = i + 1; 
+pthread_create(&reader_threads[i], NULL, reader, &reader_ids[i]); 
+} 
+for (int i = 0; i < WRITERS; i++) { 
+writer_ids[i] = i + 1; 
+pthread_create(&writer_threads[i], NULL, writer, &writer_ids[i]); 
+} 
+for (int i = 0; i < READERS; i++) { 
+pthread_join(reader_threads[i], NULL); 
+} 
+for (int i = 0; i < WRITERS; i++) { 
+pthread_join(writer_threads[i], NULL); 
+} 
+pthread_mutex_destroy(&mutex); 
+sem_destroy(&rw_mutex); 
+return 0; 
+} 
+Output of Assignment 4 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 5: Implement the C program for Deadlock Avoidance Algorithm: Bankers 
+Algorithm. 
+Code: 
+#include<stdio.h> 
+struct process{ 
+int max[10],allocate[10],need[10]; 
+}p[10]; 
+int n,m; 
+void input(int[]); 
+void display(); 
+int isSafestate(int[],int[]); 
+int safetyalgorithm(int[],int[]); 
+int main(){ 
+int i; 
+printf("\nEnter No of processes: "); 
+scanf("%d",&n); 
+printf("Enter no of resources: "); 
+scanf("%d",&m); 
+int available[m]; 
+int safesequence[n]; 
+printf("\n*****Enter details of process*****"); 
+input(available); 
+display(); 
+if(isSafestate(available,safesequence)){ 
+printf("\n\tSYSTEM IS IN SAFE STATE..."); 
+printf("\nsafesequence is: "); 
+for(i=0;i<n;i++) 
+printf("P%d -> ",safesequence[i]); 
+} 
+Else{ 
+printf("\nSYSTEM IS IN UNSAFE STATE!!!"); 
+return 0; 
+} 
+void input (int available[]){ 
+int i,j; 
+for(i=0;i<n;i++){ 
+printf("\nEnter the details of process P%d: ",i); 
+printf("\n\tEnter the allocates resources: "); 
+for(j=0;j<m;j++){ 
+scanf("%d",&p[i].allocate[j]); 
+} 
+printf("\tEnter the max resourcess: "); 
+for(j=0;j<m;j++){ 
+scanf("%d",&p[i].max[j]); 
+p[i].need[j]=p[i].max[j]-p[i].allocate[j]; 
+} 
+} 
+printf("\nEnter the allvailable resources: "); 
+for(j=0;j<m;j++){ 
+scanf("%d",&available[j]); 
+} 
+} 
+void display(){ 
+int i,j; 
+printf("\n\tPID\tALLOCATE\tMAX\t\tNEED\n"); 
+for(i=0;i<n;i++){ 
+printf("\tP%d\t",i); 
+for(j=0;j<m;j++) 
+printf("%d ",p[i].allocate[j]); 
+printf("\t\t"); 
+for(j=0;j<m;j++) 
+printf("%d ",p[i].max[j]); 
+printf("\t\t"); 
+for(j=0;j<m;j++) 
+printf("%d ",p[i].need[j]); 
+printf("\n"); 
+} 
+} 
+int isSafestate(int available[],int safesequence[]){ 
+if(safetyalgorithm(available,safesequence)==1) 
+return 1; 
+return 0; 
+} 
+int safetyalgorithm(int available[],int safesequence[]){ 
+int i,j; 
+int work[m],finish[n]; 
+for(j=0;j<m;j++) 
+work[j]=available[j]; 
+for(i=0;i<n;i++) 
+finish[i]=0; 
+int proceed=1,k=0; 
+while(proceed){ 
+proceed=0; 
+for(i=0;i<n;i++) 
+{ 
+int flag=1; 
+if(finish[i]==0){ 
+for(j=0;j<m;j++){ 
+if(p[i].need[j]<=work[j]){ 
+continue; 
+}else{ 
+} 
+} 
+if(flag==0) 
+continue; 
+flag=0; 
+break; 
+for(j=0;j<m;j++){ 
+work[j]+=p[i].allocate[j]; 
+} 
+finish[i]=1; 
+safesequence[k++]=i; 
+proceed=1; 
+} 
+} 
+} 
+for(i=0;i<n&&finish[i]==1;i++) 
+continue; 
+if(i==n) 
+return 1; 
+return 0; 
+} 
+Output of Assignment 5 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 6: Implement the C program for Page Replacement Algorithms: FCFS, LRU, and 
+Optimal for frame size as minimum three. 
+Code: 
+#include<stdio.h> 
+typedef struct { 
+char data[20][2]; 
+int end; 
+}queue; 
+void enqueue(queue *q,char data,int position); 
+char dequeue(queue *q,int position); 
+void fifo(char string[],int frameSize,int count); 
+void optimal(char string[],int frameSize,int count); 
+void lru(char string[],int frameSize,int count); 
+int main() { 
+int frameSize,count,cnt,ch; 
+char string[50]; 
+printf("Enter the string: "); 
+count=0; 
+do{ 
+} 
+scanf("%c",&string[count]); 
+count++; 
+while(string[count-1]!='\n'); 
+count--; 
+printf("\nEnter the size of the frame: "); 
+scanf("%d",&frameSize); 
+do{ 
+printf("\nMENU\n====\n1.FIFO\n2.Least Recently Used (LRU)\n3.Optimal\n4.Exit\ 
+n\nYour Choice:"); 
+scanf("%d",&ch); 
+switch(ch){ 
+case 1: 
+case 2: 
+case 3: 
+case 4: 
+default: 
+} 
+} 
+fifo(string,frameSize,count); 
+break; 
+lru(string,frameSize,count); 
+break; 
+optimal(string,frameSize,count); 
+break; 
+//exit(0); 
+break; 
+printf("\nInvalid choice! Please try again!"); 
+continue; 
+while(ch!=4); 
+} 
+void enqueue(queue *q,char data,int position) { 
+q->data[position][0]=data; 
+} 
+char dequeue(queue *q,int position){ 
+char value; 
+value=q->data[position][0]; 
+return(value); 
+} 
+void fifo(char string[],int frameSize,int count) { 
+int cnt,cnt2,flag,faults=0; 
+queue q; 
+int firstin=-1; 
+q.end=0; 
+printf("\nData Requested\tFrame contents\t Page Fault\ 
+n=============================================="); 
+for(cnt=0;cnt<count;cnt+=2) { 
+printf("\n\n\t%c",string[cnt]); 
+flag=0; 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+if(string[cnt]==q.data[cnt2][0]){ 
+flag=1; 
+break; 
+} 
+} 
+if(flag==0){ 
+faults++; 
+if(q.end<frameSize) { 
+enqueue(&q,string[cnt],q.end); 
+q.end++; 
+} 
+else{ 
+dequeue(&q,firstin); 
+firstin=(firstin+1)%(q.end); 
+enqueue(&q,string[cnt],firstin); 
+} 
+printf("\t "); 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+printf("%c ",q.data[cnt2][0]); 
+} 
+printf("\t\tY"); 
+} 
+else{ 
+} 
+printf("\t "); 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+printf("%c ",q.data[cnt2][0]); 
+printf("\t\tN"); 
+} 
+} 
+printf("\n\n==============================================\n"); 
+printf("\nTotal no. of Page Faults: %d\n\n",faults); 
+} 
+void optimal(char string[],int frameSize,int count){ 
+int cnt,cnt2,selector,flag,max,faults=0; 
+int distance[20]; 
+queue q; 
+q.end=0; 
+printf("\nData Requested\tFrame contents\t Page Fault\ 
+n=============================================="); 
+for(cnt=0;cnt<count;cnt+=2){ 
+printf("\n\n\t%c",string[cnt]); 
+flag=0; 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+if(string[cnt]==q.data[cnt2][0]) { 
+flag=1; 
+break; 
+} 
+} 
+if(flag==0) { 
+faults++; 
+if(q.end<frameSize) { 
+enqueue(&q,string[cnt],q.end); 
+q.data[q.end][1]=cnt; 
+q.end++; 
+} 
+else { 
+} 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+distance[cnt2]=0; 
+for(selector=0;selector<q.end;selector++) { 
+for(cnt2=cnt;cnt2<count;cnt2+=2){ 
+if(string[cnt2]==q.data[selector][0]) { 
+distance[selector]=cnt2/2; 
+break; 
+} 
+if(distance[selector]==0) { 
+distance[selector]=99-q.data[selector][1]; 
+} 
+} 
+} 
+max=0; 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+if(distance[cnt2]>max) { 
+max=distance[cnt2]; 
+selector=cnt2; 
+} 
+} 
+dequeue(&q,selector); 
+enqueue(&q,string[cnt],selector); 
+q.data[selector][1]=cnt; 
+} 
+printf("\t "); 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+printf("%c ",q.data[cnt2][0]); 
+} 
+printf("\t\tY"); 
+} 
+else { 
+} 
+printf("\t "); 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+printf("%c ",q.data[cnt2][0]); 
+printf("\t\tN"); 
+} 
+} 
+printf("\n\n==============================================\n"); 
+printf("\nTotal no. of Page Faults: %d\n\n",faults); 
+} 
+void lru(char string[],int frameSize,int count) { 
+int cnt,cnt2,selector,flag,min,faults=0; 
+queue q; 
+q.end=0; 
+printf("\nData Requested\tFrame contents\t Page Fault\ 
+n=============================================="); 
+for(cnt=0;cnt<count;cnt+=2) { 
+printf("\n\n\t%c",string[cnt]); 
+flag=0; 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+if(string[cnt]==q.data[cnt2][0]) { 
+q.data[cnt2][1]=(cnt/2)+1; 
+flag=1; 
+break; 
+} 
+} 
+if(flag==0) { 
+faults++; 
+if(q.end<frameSize) { 
+enqueue(&q,string[cnt],q.end); 
+q.data[q.end][1]=(cnt/2)+1; 
+q.end++; 
+} 
+else { 
+min=99; 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+if(q.data[cnt2][1]<min) { 
+min=q.data[cnt2][1]; 
+selector=cnt2; 
+} 
+} 
+dequeue(&q,selector); 
+enqueue(&q,string[cnt],selector); 
+q.data[selector][1]=(cnt/2)+1; 
+} 
+printf("\t "); 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+printf("%c ",q.data[cnt2][0]); 
+} 
+printf("\t\tY"); 
+} 
+else { 
+} 
+printf("\t "); 
+for(cnt2=0;cnt2<q.end;cnt2++) { 
+printf("%c ",q.data[cnt2][0]); 
+printf("\t\tN"); 
+} 
+} 
+printf("\n\n==============================================\n"); 
+printf("\nTotal no. of Page Faults: %d\n\n",faults); 
+} 
+Output of Assignment 6 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 7: Inter process communication in Linux using following. 
+A.
+ FIFOS: Full duplex communication between two independent processes. First process 
+accepts sentences and writes on one pipe to be read by second process and second process 
+counts number of characters, number of words and number of lines in accepted sentences, 
+writes this output in a text file and writes the contents of the file on second pipe to be read by 
+first process and displays on standard output. 
+B.
+ Inter-process Communication using Shared Memory using System V. Application to 
+demonstrate: Client and Server Programs in which server process creates a shared memory 
+segment and writes the message to the shared memory segment. Client process reads the 
+message from the shared memory segment and displays it to the screen. 
+Code (A): 
+Process 1 - 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include <unistd.h> 
+#include <fcntl.h> 
+#include <sys/stat.h> 
+#define FIFO1 "fifo1" // FIFO for writing from process1 to process2 
+#define FIFO2 "fifo2"  // FIFO for writing from process2 to process1 
+int main() { 
+char sentence[1024]; 
+char result[1024]; 
+// Create FIFOs (named pipes) if they don't exist 
+mkfifo(FIFO1, 0666); 
+mkfifo(FIFO2, 0666); 
+// Get user input 
+printf("Enter a sentence: "); 
+fgets(sentence, sizeof(sentence), stdin); 
+// Write the sentence to FIFO1 
+int fd1 = open(FIFO1, O_WRONLY); 
+if (fd1 < 0) { 
+perror("Error opening FIFO1 for writing"); 
+exit(1); 
+} 
+write(fd1, sentence, strlen(sentence) + 1); 
+close(fd1); 
+// Read the result from FIFO2 
+int fd2 = open(FIFO2, O_RDONLY); 
+if (fd2 < 0) { 
+perror("Error opening FIFO2 for reading"); 
+exit(1); 
+} 
+read(fd2, result, sizeof(result)); 
+close(fd2); 
+// Display the result 
+printf("\nProcessed output from Process 2:\n%s\n", result); 
+// Remove the FIFOs (optional, can comment out if reusing) 
+unlink(FIFO1); 
+unlink(FIFO2); 
+return 0; 
+} 
+Process 2 - 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <string.h> 
+#include <unistd.h> 
+#include <fcntl.h> 
+#include <sys/stat.h> 
+#define FIFO1 "fifo1" // FIFO for writing from process1 to process2 
+#define FIFO2 "fifo2"  // FIFO for writing from process2 to process1 
+// Function to count characters, words, and lines 
+void count_stats(char *sentence, int *chars, int *words, int *lines) { 
+*chars = strlen(sentence); 
+*words = 0; 
+*lines = 0; 
+int in_word = 0; 
+for (int i = 0; i < *chars; i++) { 
+if (sentence[i] == '\n') { 
+(*lines)++; 
+} 
+if (sentence[i] == ' ' || sentence[i] == '\n' || sentence[i] == '\t') { 
+in_word = 0; 
+} else if (!in_word) { 
+in_word = 1; 
+(*words)++; 
+} 
+} 
+if (*lines == 0) { 
+*lines = 1; // If no newline, count as one line 
+} 
+} 
+int main() { 
+char sentence[1024]; 
+int chars, words, lines; 
+char result[1024]; 
+// Read the sentence from FIFO1 
+int fd1 = open(FIFO1, O_RDONLY); 
+if (fd1 < 0) { 
+perror("Error opening FIFO1 for reading"); 
+exit(1); 
+} 
+read(fd1, sentence, sizeof(sentence)); 
+close(fd1); 
+// Count characters, words, and lines 
+count_stats(sentence, &chars, &words, &lines); 
+// Write the statistics to a file 
+FILE *fp = fopen("output.txt", "w"); 
+if (fp == NULL) { 
+perror("Error opening output.txt"); 
+exit(1); 
+} 
+fprintf(fp, "Number of characters: %d\n", chars); 
+fprintf(fp, "Number of words: %d\n", words); 
+fprintf(fp, "Number of lines: %d\n", lines); 
+fclose(fp); 
+// Read the result from the file 
+fp = fopen("output.txt", "r"); 
+if (fp == NULL) { 
+perror("Error reading output.txt"); 
+exit(1); 
+} 
+fread(result, sizeof(char), sizeof(result), fp); 
+fclose(fp); 
+// Write the result to FIFO2 
+int fd2 = open(FIFO2, O_WRONLY); 
+if (fd2 < 0) { 
+perror("Error opening FIFO2 for writing"); 
+exit(1); 
+} 
+write(fd2, result, strlen(result) + 1); 
+close(fd2); 
+return 0; 
+} 
+Code (B): 
+Sender- 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <unistd.h> 
+#include <sys/types.h> 
+#include <sys/ipc.h> 
+#include <sys/shm.h> 
+#define SHMSZ 25 
+int main() { 
+int shmid, cnt = 0; 
+key_t key; 
+char *shm, *s; 
+char str[SHMSZ]; 
+key = 5678; 
+// Create the shared memory segment 
+if ((shmid = shmget(key, SHMSZ, IPC_CREAT | 0666)) < 0) { 
+perror("shmget"); 
+exit(1); 
+} 
+// Attach the segment to our data space 
+if ((shm = (char *)shmat(shmid, NULL, 0)) == (char *)-1) { 
+perror("shmat"); 
+exit(1); 
+} 
+s = shm; 
+// Writing message to shared memory 
+printf("Enter message from Server to Client: "); 
+fgets(str, sizeof(str), stdin); 
+for (cnt = 0; str[cnt] != '\0'; cnt++) { 
+*s++ = str[cnt]; 
+} 
+*s = '\0'; // Null terminate string in shared memory 
+printf("Message written to shared memory successfully.\n"); 
+// Detach from shared memory 
+shmdt(shm); 
+return 0; 
+} 
+Client- 
+#include <sys/types.h> 
+#include <sys/ipc.h> 
+#include <sys/shm.h> 
+#include <stdio.h> 
+#include <stdlib.h> 
+#define SHMSZ 25 
+int main() { 
+int shmid; 
+key_t key; 
+char *shm, *s; 
+key = 5678; // Same key as used by the server 
+// Locate the segment created by server 
+if ((shmid = shmget(key, SHMSZ, 0666)) < 0) { 
+perror("shmget"); 
+exit(1); 
+} 
+// Attach the segment to our data space 
+if ((shm = (char *)shmat(shmid, NULL, 0)) == (char *)-1) { 
+perror("shmat"); 
+exit(1); 
+} 
+printf("Client reading data from Server:\n"); 
+// Read from shared memory 
+for (s = shm; *s != '\0'; s++) { 
+putchar(*s); 
+} 
+printf("\n"); 
+// Detach from shared memory 
+shmdt(shm); 
+// Remove the shared memory segment 
+shmctl(shmid, IPC_RMID, NULL); 
+return 0; 
+} 
+Output of Assignment 7 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
+Assignment 8: Implement the C program for Disk Scheduling Algorithms: SSTF, SCAN, C- 
+Look considering the initial head position moving away from the spindle. 
+Code: 
+#include <stdio.h> 
+#include <stdlib.h> 
+#include <math.h> 
+int SSTF(); 
+int SCAN(); 
+int CLOOK(); 
+int main() { 
+int ch, YN = 1; 
+do { 
+printf("\n\n\t*********** MENU ***********"); 
+printf("\n\n\t1: SSTF"); 
+printf("\n\n\t2: SCAN"); 
+printf("\n\n\t3: C-LOOK"); 
+printf("\n\n\t4: EXIT"); 
+printf("\n\n\tEnter your choice: "); 
+scanf("%d", &ch); 
+switch (ch) { 
+case 1: 
+SSTF(); 
+break; 
+case 2: 
+SCAN(); 
+break; 
+case 3: 
+CLOOK(); 
+break; 
+case 4: 
+exit(0); 
+default: 
+printf("\nInvalid choice! Please try again.\n"); 
+} 
+printf("\n\n\tDo you want to continue?"); 
+printf("\n\tIf YES press 1");
+ printf("\n\tIf NO press 0: "); 
+scanf("%d", &YN); 
+} while (YN == 1); 
+return 0; 
+} 
+//SSTF Algorithm 
+int SSTF() { 
+int RQ[100], i, n, TotalHeadMovement = 0, initial, count = 0; 
+printf("\n--- SSTF Disk Scheduling Algorithm ---\n"); 
+printf("Enter the number of Requests: "); 
+scanf("%d", &n); 
+printf("Enter the Requests sequence:\n"); 
+for (i = 0; i < n; i++) { 
+scanf("%d", &RQ[i]); 
+} 
+printf("Enter initial head position: "); 
+scanf("%d", &initial); 
+while (count != n) { 
+int min = 1000, d, index = -1; 
+for (i = 0; i < n; i++) { 
+if (RQ[i] != 1000) { 
+d = abs(RQ[i] - initial); 
+if (min > d) { 
+min = d; 
+index = i; 
+} 
+} 
+} 
+TotalHeadMovement += min; 
+initial = RQ[index]; 
+RQ[index] = 1000; 
+count++; 
+} 
+printf("\nTotal head movement is %d\n", TotalHeadMovement); 
+return 0; 
+} 
+//SCAN Algorithm 
+int SCAN() { 
+int RQ[100], i, j, n, TotalHeadMovement = 0, initial, size, move; 
+printf("\n--- SCAN Disk Scheduling Algorithm ---\n"); 
+printf("Enter the number of Requests: "); 
+scanf("%d", &n); 
+printf("Enter the Requests sequence:\n"); 
+for (i = 0; i < n; i++) { 
+scanf("%d", &RQ[i]); 
+} 
+printf("Enter initial head position: "); 
+scanf("%d", &initial); 
+printf("Enter total disk size: "); 
+scanf("%d", &size); 
+printf("Enter the head movement direction (for high = 1, for low = 0): "); 
+scanf("%d", &move); 
+// Sort the request queue 
+for (i = 0; i < n - 1; i++) { 
+for (j = 0; j < n - i - 1; j++) { 
+if (RQ[j] > RQ[j + 1]) { 
+int temp = RQ[j]; 
+RQ[j] = RQ[j + 1]; 
+RQ[j + 1] = temp; 
+} 
+} 
+} 
+int index = 0; 
+for (i = 0; i < n; i++) { 
+if (initial < RQ[i]) { 
+index = i; 
+break; 
+} 
+} 
+// Move right (toward higher values) 
+if (move == 1) { 
+for (i = index; i < n; i++) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+TotalHeadMovement += abs((size - 1) - RQ[n - 1]); 
+initial = size - 1; 
+for (i = index - 1; i >= 0; i--) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+} 
+// Move left (toward lower values) 
+else { 
+for (i = index - 1; i >= 0; i--) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+TotalHeadMovement += abs(RQ[0] - 0); 
+initial = 0; 
+for (i = index; i < n; i++) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+} 
+printf("\nTotal head movement is %d\n", TotalHeadMovement); 
+return 0; 
+} 
+//C-LOOK Algorithm 
+int CLOOK() { 
+int RQ[100], i, j, n, TotalHeadMovement = 0, initial, size, move; 
+printf("\n--- C-LOOK Disk Scheduling Algorithm ---\n"); 
+printf("Enter the number of Requests: "); 
+scanf("%d", &n); 
+printf("Enter the Requests sequence:\n"); 
+for (i = 0; i < n; i++) { 
+scanf("%d", &RQ[i]); 
+} 
+printf("Enter initial head position: "); 
+scanf("%d", &initial); 
+printf("Enter total disk size: "); 
+scanf("%d", &size); 
+printf("Enter the head movement direction (for high = 1, for low = 0): "); 
+scanf("%d", &move); 
+// Sort the request queue 
+for (i = 0; i < n - 1; i++) { 
+for (j = 0; j < n - i - 1; j++) { 
+if (RQ[j] > RQ[j + 1]) { 
+int temp = RQ[j]; 
+RQ[j] = RQ[j + 1]; 
+RQ[j + 1] = temp; 
+} 
+} 
+} 
+int index = 0; 
+for (i = 0; i < n; i++) { 
+if (initial < RQ[i]) { 
+index = i; 
+break; 
+} 
+} 
+if (move == 1) { // move right 
+for (i = index; i < n; i++) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+for (i = 0; i < index; i++) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+} else { // move left 
+for (i = index - 1; i >= 0; i--) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+for (i = n - 1; i >= index; i--) { 
+TotalHeadMovement += abs(RQ[i] - initial); 
+initial = RQ[i]; 
+} 
+} 
+printf("\nTotal head movement is %d\n", TotalHeadMovement); 
+return 0; 
+} 
+Output of Assignment 8 
+Name: Pranita Jadhav 
+Roll No.: 307A043 
+Class & Div: TE IT 01 
