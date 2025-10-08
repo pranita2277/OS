@@ -1,0 +1,99 @@
+Code: 
+#!/bin/bash 
+opt=1 
+fileName="addressbook.txt" # Default file name (can be changed later) 
+while [ "$opt" -lt 6 ] 
+do 
+echo -e "\nChoose one of the Following:" 
+echo "1. Create a New Address Book" 
+echo "2. View Records" 
+echo "3. Insert New Record" 
+echo "4. Delete a Record" 
+echo "5. Modify a Record" 
+echo "6. Exit" 
+echo -n "Enter your choice: " 
+read opt 
+case $opt in 
+1) 
+echo -n "Enter filename: " 
+read fileName 
+if [ -e "$fileName" ]; then 
+rm "$fileName" 
+fi 
+echo -e "NAME\tNUMBER\t\tADDRESS\n===============================\n" 
+>> "$fileName" 
+cont=1 
+while [ "$cont" -gt 0 ] 
+do 
+echo -n "Enter Name: " 
+read name 
+echo -n "Enter Phone Number of $name: " 
+read number 
+echo -n "Enter Address of $name: " 
+read address 
+echo -e "$name\t$number\t\t$address" >> "$fileName" 
+echo -n "Enter 0 to Stop, 1 to Enter next: " 
+read cont 
+done 
+;; 
+2) 
+3) 
+if [ -e "$fileName" ]; then 
+echo -e "\n===== Address Book: $fileName =====" 
+cat "$fileName" 
+else 
+echo "File not found! Please create an address book first." 
+fi 
+;; 
+if [ ! -e "$fileName" ]; then 
+echo "File not found! Please create an address book first." 
+else 
+echo -n "Enter Name: " 
+read name 
+echo -n "Enter Phone Number of $name: " 
+read number 
+echo -n "Enter Address of $name: " 
+read address 
+echo -e "$name\t$number\t\t$address" >> "$fileName" 
+echo "Record inserted successfully!" 
+fi 
+;; 
+4) 
+5) 
+if [ ! -e "$fileName" ]; then 
+echo "File not found! Please create an address book first." 
+else 
+echo -n "Delete record — Enter Name/Phone Number: " 
+read pattern 
+grep -v "$pattern" "$fileName" > temp 
+mv temp "$fileName" 
+echo "Record deleted (if found)." 
+fi 
+;; 
+if [ ! -e "$fileName" ]; then 
+echo "File not found! Please create an address book first." 
+else 
+echo -n "Modify record — Enter Name/Phone Number: " 
+read pattern 
+grep -v "$pattern" "$fileName" > temp 
+mv temp "$fileName" 
+echo -n "Enter New Name: " 
+read name 
+echo -n "Enter Phone Number of $name: " 
+read number 
+echo -n "Enter Address of $name: " 
+read address 
+echo -e "$name\t$number\t\t$address" >> "$fileName" 
+echo "Record modified successfully!" 
+fi 
+;; 
+6) 
+*) 
+esac 
+done 
+echo "Exiting program..." 
+exit 0 
+;; 
+echo "Invalid option! Please try again." 
+;; 
+Output of Assignment 1:
